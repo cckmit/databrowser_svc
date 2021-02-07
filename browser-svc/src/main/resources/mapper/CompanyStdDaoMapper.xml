@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csf.databrowser.dao.CompanyStdDao">
+
+    <sql id="BASE_TABLE">company_std</sql>
+    <sql id="BASE_COLUMN">std_name, credit_code, reg_capital,estiblish_time, reg_status, legal_person_name, company_type, from_time, to_time,reg_location</sql>
+    <sql id="BASE_COLUMN2">cbs.postal_address, cbs.business_scope, cbs.postcode,cbs.phone_number, cbs.email,cbs.website</sql>
+    <sql id="BASE_COLUMN3">bs.ticker, bs.abbr, bs.mkt,bs.list_dt, bs.list_edt</sql>
+
+    <select id="getCompanyExtract" parameterType="string" resultType="com.csf.databrowser.resp.CompanyExtractResp">
+        select
+        <include refid="BASE_COLUMN"/>,
+        <include refid="BASE_COLUMN2"/>,
+        <include refid="BASE_COLUMN3"/>
+        from
+        company_std cs
+        left join company_business_scope cbs
+        on cs.csf_id=cbs.csf_id
+        left join base_stock bs
+        on cs.csf_id=bs.csfid
+        where
+        cs.csf_id=#{csfId}
+    </select>
+
+</mapper>

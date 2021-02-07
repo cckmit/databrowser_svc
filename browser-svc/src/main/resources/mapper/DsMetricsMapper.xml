@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csf.databrowser.dao.DsMetricsDao">
+
+    <sql id="BASE_TABLE">ds_metrics</sql>
+
+    <sql id="BASE_COLUMN">id, code, `name`, alias, metric_type, status, created_by, created_time, updated_by, updated_time</sql>
+
+    <select id="findMetricsAndGroupByModule" resultType="com.csf.databrowser.entity.DsMetricsByModule" parameterType="java.lang.Integer">
+        select mo.module_id,gr.group_code,gr.group_name,dm.code,dm.name,dm.alias,dm.metric_type
+        from ds_module_metric_group mo
+        inner join ds_metrics_groups gr on mo.group_code=gr.group_code and gr.status=1
+        inner join ds_group_metrics dgm on gr.group_code = dgm.group_code and dgm.status=1
+        inner join ds_metrics dm on dm.code=dgm.metric_code and dm.status=1
+        where mo.module_id = #{moduleId} and mo.status=1
+    </select>
+
+</mapper>

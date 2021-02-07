@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csf.databrowser.dao.CompanyScopeDao">
+
+    <sql id="BASE_TABLE">company_business_scope</sql>
+    <sql id="BASE_COLUMN">postal_address, business_scope, postcode,phone_number, email,website</sql>
+
+    <select id="getCompanyExtract" parameterType="string" resultType="com.csf.databrowser.resp.CompanyExtractResp">
+        select
+        <include refid="BASE_COLUMN"/>
+        from
+        <include refid="BASE_TABLE"/>
+        where
+        csf_id=#{csfId}
+    </select>
+
+</mapper>

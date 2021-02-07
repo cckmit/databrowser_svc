@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csf.databrowser.dao.DsCombineMetricsDao">
+
+    <sql id="BASE_TABLE">ds_combine_metrics</sql>
+    <sql id="BASE_COLUMN">id, metric_code, nest_code,nest_name, status, created_by, created_time, updated_by, updated_time</sql>
+
+    <select id="findByMetricsCode" parameterType="string" resultType="com.csf.databrowser.entity.DsCombineMetrics">
+        select <include refid="BASE_COLUMN"/> from <include refid="BASE_TABLE"/>
+        where metric_code=#{metricsCode} and status = 1
+    </select>
+
+</mapper>
