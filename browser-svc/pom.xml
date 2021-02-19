@@ -104,6 +104,12 @@
             <artifactId>easypoi-spring-boot-starter</artifactId>
             <version>4.0.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.csf.risk.common</groupId>
+            <artifactId>risk-common</artifactId>
+            <version>1.0.5</version>
+        </dependency>
     </dependencies>
 
 

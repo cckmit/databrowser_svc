@@ -1,9 +1,10 @@
 package com.csf.databrowser.entity;
 
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -47,6 +48,8 @@ public class DsMetricsMap implements Serializable {
     private String extraInfo;
 
     private Integer status;
+
+    private Integer list;
 
     private String createdBy;
 

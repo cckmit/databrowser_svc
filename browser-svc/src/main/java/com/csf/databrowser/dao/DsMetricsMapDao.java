@@ -2,6 +2,10 @@ package com.csf.databrowser.dao;
 
 import com.csf.databrowser.entity.DsMetricsMap;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>
@@ -13,5 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface DsMetricsMapDao {
+
+    List<DsMetricsMap> getMetricsMap(@Param("list") Collection<String> metricCodes);
 
 }

@@ -21,7 +21,6 @@ public class CompanyHelper {
                 Method getMethod = obj.getMethod("get" + replace);
 
                 //进行赋值
-                //Class<? extends CompanyExtractResp> respClass = resp.getClass();
                 String result = (String) getMethod.invoke(resp);
                 if (StringUtils.isNotEmpty(result)){
                     setMethod.invoke(instance,result);

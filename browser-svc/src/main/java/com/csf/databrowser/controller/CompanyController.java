@@ -1,5 +1,6 @@
 package com.csf.databrowser.controller;
 
+import com.csf.databrowser.request.CommonMetriesReq;
 import com.csf.databrowser.request.ExtractRequest;
 import com.csf.databrowser.resp.CompaniesInfoResp;
 import com.csf.databrowser.service.CompanyService;
@@ -42,6 +43,12 @@ public class CompanyController {
     public ResponseEntity download(HttpServletRequest request) {
 
         return ResponseEntity.ok(companyService.download(request));
+    }
+
+    @PostMapping("/company")
+    public ResponseEntity getCompanyInfo(@RequestBody CommonMetriesReq req){
+        req.parameterCheck(false);
+        return ResponseEntity.ok(companyService.getPageData(req));
     }
 
 }
