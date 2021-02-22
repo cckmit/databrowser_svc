@@ -8,6 +8,7 @@ import com.csf.databrowser.resp.CompanySearchResp;
 import com.csf.databrowser.resp.DataRes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 
 public interface CompanyService {
@@ -21,4 +22,7 @@ public interface CompanyService {
     String download(HttpServletRequest request);
 
     DataRes getPageData(CommonMetriesReq req);
+
+    void exportCompanyInfo(CommonMetriesReq req, HttpServletResponse response, HttpServletRequest request);
 }
+

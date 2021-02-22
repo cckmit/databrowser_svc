@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csf.databrowser.dao.DsExportRecordDao">
+
+    <insert id="createExportRecord" parameterType="com.csf.databrowser.entity.DsExportRecord">
+        INSERT INTO ds_export_record (username, url, file_size, csf_ids, metrics, duration)
+        VALUE (#{username}, #{url}, #{fileSize}, #{csfIds}, #{metrics}, #{duration})
+    </insert>
+
+</mapper>

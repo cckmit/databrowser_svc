@@ -6,8 +6,11 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.csf.databrowser.convert.ValueConvert;
 import com.csf.databrowser.dao.DsMetricsMapDao;
 import com.csf.databrowser.dao.DsPublicDao;
+import com.csf.databrowser.entity.DsExportRecord;
 import com.csf.databrowser.entity.DsMetricsMap;
 import com.csf.databrowser.excel.CompanyWorkbookRead;
+import com.csf.databrowser.excel.DataSheetTemplate;
+import com.csf.databrowser.excel.WorkbookBuilder;
 import com.csf.databrowser.extract.ExcelHelper;
 import com.csf.databrowser.request.CommonMetriesReq;
 import com.csf.databrowser.request.ExtractRequest;
@@ -15,6 +18,8 @@ import com.csf.databrowser.resp.*;
 import com.csf.databrowser.service.CompanyInfoService;
 import com.csf.databrowser.service.CompanyService;
 import com.csf.databrowser.service.CompanyStdService;
+import com.csf.databrowser.service.DsExportSerivce;
+import com.csf.risk.common.util.RiskUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,10 +32,12 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,7 +58,8 @@ public class CompanyServiceImpl implements CompanyService {
     private DsMetricsMapDao dsMetricsMapDao;
     @Autowired
     private DsPublicDao dsPublicDao;
-
+    @Autowired
+    private DsExportSerivce dsExportSerivce;
 
     @Value("${company.limit:100}")
     private Integer companyLimit;
@@ -148,6 +156,81 @@ public class CompanyServiceImpl implements CompanyService {
         res.setTotal(result.size());
         res.setData(result.stream().skip(satrt).limit(req.getSize()).collect(Collectors.toList()));
         return res;
+    }
+
+    @Override
+    public void exportCompanyInfo(CommonMetriesReq req, HttpServletResponse response, HttpServletRequest request) {
+        exportDataInfo(req, response, request, "公司基本信息");
+    }
+
+    private void exportDataInfo(CommonMetriesReq req, HttpServletResponse response,
+                                HttpServletRequest request, String sheetName) {
+        long start = System.currentTimeMillis();
+        List<Map<String, Object>> result = getData(req);
+        String[] headers = getTitles(req.getMetricsInfos());
+        String[] metricsCodes = getMetrics(req.getMetricsInfos());
+        List<List<Object>> contentList = getContent(result, req.getMetricsInfos());
+
+        DsExportRecord record = new DsExportRecord();
+        int fileSize = exportData(response, contentList, headers, sheetName);
+
+        record.setFileSize(fileSize);
+        record.setUsername(RiskUtil.getUsername());
+        record.setCsfIds(String.join(",", req.getCsfIds()));
+        record.setUrl(request.getRequestURI());
+        record.setMetrics(String.join(",", metricsCodes));
+        record.setDuration(System.currentTimeMillis() - start);
+        dsExportSerivce.addExportData(record);
+    }
+
+    private int exportData(HttpServletResponse response, List<List<Object>> contentList, String[] headers, String sheetName) {
+        response.setContentType("application/ms-excel");
+        response.setCharacterEncoding("UTF-8");
+        int size = 0;
+        try {
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(getExportFileName(), "UTF-8"));
+            WorkbookBuilder workbookBuilder = new WorkbookBuilder(response.getOutputStream());
+            workbookBuilder.addSheet(new DataSheetTemplate(contentList, headers, sheetName));
+            size = workbookBuilder.build();
+        } catch (Exception e) {
+            log.error("export error", e);
+        }
+        return size;
+    }
+
+    private String getExportFileName() {
+        return "公司基本信息导出.xlsx";
+    }
+
+    private List<List<Object>> getContent(List<Map<String, Object>> result, List<CommonMetriesReq.MetricsInfo> metricsInfos) {
+        if(CollectionUtils.isEmpty(result)) {
+            return Collections.EMPTY_LIST;
+        }
+        List<List<Object>> contentList = new ArrayList<>(result.size());
+        for(Map<String, Object> value : result) {
+            List<Object> list = new ArrayList<>();
+            for (CommonMetriesReq.MetricsInfo info : metricsInfos) {
+                list.add(value.get(info.getMetricsCode()) != null ? value.get(info.getMetricsCode()) : "");
+            }
+            contentList.add(list);
+        }
+        return contentList;
+    }
+
+    private String[] getMetrics(List<CommonMetriesReq.MetricsInfo> metricsInfos) {
+        String[] metricsCodes = new String[metricsInfos.size()];
+        for (int i = 0; i < metricsCodes.length; i++) {
+            metricsCodes[i] = metricsInfos.get(i).getMetricsCode();
+        }
+        return metricsCodes;
+    }
+
+    private String[] getTitles(List<CommonMetriesReq.MetricsInfo> metricsInfos) {
+        String[] headers = new String[metricsInfos.size()];
+        for (int i = 0; i < headers.length; i++) {
+            headers[i] = metricsInfos.get(i).getTitle();
+        }
+        return headers;
     }
 
     private List<Map<String, Object>> getData(CommonMetriesReq req) {

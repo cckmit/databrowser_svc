@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
@@ -49,6 +50,12 @@ public class CompanyController {
     public ResponseEntity getCompanyInfo(@RequestBody CommonMetriesReq req){
         req.parameterCheck(false);
         return ResponseEntity.ok(companyService.getPageData(req));
+    }
+
+    @PostMapping("/company/export")
+    public void exportCompanyInfo(@RequestBody CommonMetriesReq req, HttpServletResponse response, HttpServletRequest request){
+        req.parameterCheck(true);
+        companyService.exportCompanyInfo(req, response, request);
     }
 
 }
